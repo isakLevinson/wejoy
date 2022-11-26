@@ -3,16 +3,10 @@ devices =
    {
       d0 = --Thrustmaster Warthog Joystick
 	 {
-	    vendorid = 0x044f,
-	    productid = 0x0402,
+	    vendorid = 0x0738,
+	    productid = 0x2215,
 	 },
 
-      d1 = --Thrustmaster Warthog Throttle
-	 {
-	    vendorid = 0x044f,
-	    productid = 0x0404,
-	 },
-      
       kbd0 = "/dev/input/by-id/usb-04d9_USB_Keyboard-event-kbd",  -- keyboard device (try to find a suitable device by listing input devices by typing 'ls /dev/input/by-id/' )
       kbd1 = "/dev/input/by-id/usb-Aqua_Computer_GmbH___Co._KG_aquaero_07538-20376-event-kbd" -- another keyboard device example
    }
@@ -54,29 +48,6 @@ function kbd0_released(value)
       send_button_event(0, 1, 0)
    end
 end
-
-
--- Send keyboard key 'a' when button 0 on device 1 is pressed, and release the key when button is released.
-function d1_b0_event(value)
-   if value == 1 then
-      send_keyboard_event(KEY_A, 1)
-   else
-      send_keyboard_event(KEY_A, 0)
-   end
-end
-
-
--- Send keyboard key 'LEFTSHIFT + a' (A) when button 1 on device 1 is pressed, and release the keys when button is released.
-function d1_b1_event(value)
-   if value == 1 then
-      send_keyboard_event(KEY_LEFTSHIFT, 1)
-      send_keyboard_event(KEY_A, 1)
-   else
-      send_keyboard_event(KEY_LEFTSHIFT, 0)
-      send_keyboard_event(KEY_A, 0)
-   end
-end
-
 
 -- Send a button 0 event to virtual device 0 when button 0 on physical device 0 is pressed and released.
 function d0_b0_event(value)
