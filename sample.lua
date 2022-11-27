@@ -26,31 +26,25 @@ v_devices =
 -- get_vjoy_axis_status(vjoy, axis)
 
 function ltr_x_event(value)
-   send_axis_event(0, 0, value)
+   send_axis_event(0, value)
 end
 
 function ltr_y_event(value)
-   send_axis_event(0, 1, value)
+   send_axis_event(1, value)
 end
 
 function ltr_z_event(value)
-   send_axis_event(0, 2, value)
+   send_axis_event(2, value)
 end
 
 function ltr_h_event(value)
-   send_axis_event(0, 3, value)
+   send_axis_event(3, value)
 end
 
 function ltr_p_event(value)
-   send_axis_event(0, 4, value)
+   send_axis_event(4, value)
 end
 
 function ltr_r_event(value)
-   send_axis_event(0, 5, value)
+   send_axis_event(5, value)
 end
-
-
-function ltr_xxx_event(value)
-   send_axis_event(0, 6, value)
-end
-

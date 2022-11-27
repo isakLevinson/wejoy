@@ -9,7 +9,7 @@
 
 namespace GLOBAL
 {
-    std::vector<CVirtualJoy*> vJoyList;
+std::vector<CVirtualJoy*> vJoyList;
 }
 
 #endif

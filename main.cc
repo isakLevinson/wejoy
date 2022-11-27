@@ -53,63 +53,22 @@ void updateThreadJoysticks(LuaScript &lScript)
 }
 
 //Called from user via lua script
-int l_send_vjoy_button_event(lua_State* _L)
-{
-	unsigned int id = lua_tonumber(_L, 1);
-	int type = lua_tonumber(_L, 2);
-	int value = lua_tonumber(_L, 3);
-
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR send_vjoy_button_event: Virtual device " << id << " does not exist.\n";
-		return 0;
-	}//if
-	GLOBAL::vJoyList[id]->send_button_event(type, value);
-	return 0;
-}
-
-//Called from user via lua script
 int l_send_vjoy_axis_event(lua_State* _L)
 {
-	unsigned int id = lua_tonumber(_L, 1);
-	int type = lua_tonumber(_L, 2);
-	int value = lua_tonumber(_L, 3);
+	int type = lua_tonumber(_L, 1);
+	int value = lua_tonumber(_L, 2);
 
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR send_vjoy_axis_event: Virtual device " << id << " does not exist.\n";
-		return 0;
-	}//if
-	GLOBAL::vJoyList[id]->send_axis_event(type, value);
+	GLOBAL::vJoyList[0]->send_axis_event(type, value);
 
 	return 0;
 }
-
-//Called from user via lua script
-int l_get_vjoy_button_status(lua_State* L)
-{
-	unsigned int id = lua_tonumber(L, 1);
-	int type = lua_tonumber(L, 2);
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR get_vjoy_button_status: Virtual device " << id << " does not exist.\n";
-		lua_pushnumber(L, -1);
-		return 1;
-	}
-	int status = GLOBAL::vJoyList[id]->get_button_status(type);
-	lua_pushnumber(L, status);
-	return 1;
-}
-
 
 //Called from user via lua script
 int l_get_vjoy_axis_status(lua_State* L)
 {
-	unsigned int id = lua_tonumber(L, 1);
-	int type = lua_tonumber(L, 2);
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR get_vjoy_axis_status: Virtual device " << id << " does not exist.\n";
-		lua_pushnumber(L, -1);
-		return 1;
-	}
-	int status = GLOBAL::vJoyList[id]->get_axis_status(type);
+	int type = lua_tonumber(L, 1);
+
+	int status = GLOBAL::vJoyList[0]->get_axis_status(type);
 	lua_pushnumber(L, status);
 	return 1;
 }
@@ -179,9 +138,7 @@ bool populate_virtual_devices(LuaScript &lScript)
 //Initialize lua functions
 void link_lua_functions(LuaScript &lScript)
 {
-	lScript.pushcfunction(l_send_vjoy_button_event, "send_button_event");
 	lScript.pushcfunction(l_send_vjoy_axis_event,   "send_axis_event");
-	lScript.pushcfunction(l_get_vjoy_button_status, "get_vjoy_button_status");
 	lScript.pushcfunction(l_get_vjoy_axis_status,   "get_vjoy_axis_status");
 }
 
