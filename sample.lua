@@ -1,14 +1,4 @@
 
---Virtual devices to create, current limit is maximum 53 (0 to 52) buttons and 19 (0 to 18) axes. Note that not every button or axis is fully tested to work.
---Creating more than one virtual devices is possible, making room for more buttons and axes.
-v_devices = 
-   {
-      v0 = 
-	 {
-	    buttons = 1,
-	    axes = 6
-	 }
-   }
 
 -- Send method for keyboard. Key is given, i.e. KEY_G (check reference document for more supported key-codes), and state is given, i.e. 0 for release or 1 for press.
 -- send_keyboard_event(key, state)

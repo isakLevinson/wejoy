@@ -3,12 +3,13 @@
 #include <mutex>
 
 #include "LuaScript.h"
-#include "global.h"
 #include "CKeyboard.h"
 #include "linuxtrack.h"
+#include "CVirtualJoy.h"
 
 bool bPoll = true;
 std::mutex mtx;
+CVirtualJoy*  vJoy;
 
 void updateThreadJoysticks(LuaScript &lScript)
 {
@@ -58,7 +59,7 @@ int l_send_vjoy_axis_event(lua_State* _L)
 	int type = lua_tonumber(_L, 1);
 	int value = lua_tonumber(_L, 2);
 
-	GLOBAL::vJoyList[0]->send_axis_event(type, value);
+	vJoy->send_axis_event(type, value);
 
 	return 0;
 }
@@ -68,7 +69,7 @@ int l_get_vjoy_axis_status(lua_State* L)
 {
 	int type = lua_tonumber(L, 1);
 
-	int status = GLOBAL::vJoyList[0]->get_axis_status(type);
+	int status = vJoy->get_axis_status(type);
 	lua_pushnumber(L, status);
 	return 1;
 }
@@ -123,14 +124,7 @@ bool populate_virtual_devices(LuaScript &lScript)
 		cIndex++;
 	}//for
 
-	//Create and populate the list of user defined virtual devices
-	for (unsigned int i = 0; i < dList.size(); i++) {
-		CVirtualJoy* vJoy = new CVirtualJoy(dList[i][0], dList[i][1]);
-		if (!vJoy->isOpen()) {
-			return false;
-		}
-		GLOBAL::vJoyList.push_back(vJoy);
-	}//for
+	vJoy = new CVirtualJoy(1, 6);
 
 	return true;
 }
