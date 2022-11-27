@@ -11,7 +11,7 @@ bool bPoll = true;
 std::mutex mtx;
 CVirtualJoy*  vJoy;
 
-void updateThreadJoysticks(LuaScript &lScript)
+void updateThreadJoysticks(void)
 {
 	int retVal;
 	//linuxtrack_state_type state;
@@ -40,12 +40,12 @@ void updateThreadJoysticks(LuaScript &lScript)
 
 			printf("ltr: %6d %6d %6d %6d %6d %6d\n", h, p, r, x, y, z);
 
-			lScript.call_device_function("ltr_x_event", x);
-			lScript.call_device_function("ltr_y_event", y);
-			lScript.call_device_function("ltr_z_event", z);
-			lScript.call_device_function("ltr_h_event", h);
-			lScript.call_device_function("ltr_p_event", p);
-			lScript.call_device_function("ltr_r_event", r);
+			vJoy->send_axis_event(0, x);
+			vJoy->send_axis_event(1, y);
+			vJoy->send_axis_event(2, z);
+			vJoy->send_axis_event(3, h);
+			vJoy->send_axis_event(4, p);
+			vJoy->send_axis_event(5, r);
 
 		} else {
 			printf("...\n");
@@ -74,68 +74,13 @@ int l_get_vjoy_axis_status(lua_State* L)
 	return 1;
 }
 
-
-//Populate a list of physical devices defined in user lua file
-bool populate_devices(LuaScript &lScript)
-{
-	//Get the data from the user lua file
-	std::vector<std::array<int, 2>> dList;
-	std::array<int, 2> val;
-	int cIndex = 0;
-	while (1) {
-		bool noerr;
-		val[0] = lScript.get<int>("devices.d" + std::to_string(cIndex) + ".vendorid", noerr);
-		if (!noerr) {
-			break;
-		}
-		val[1] = lScript.get<int>("devices.d" + std::to_string(cIndex) + ".productid", noerr);
-		if (!noerr) {
-			break;
-		}
-
-		dList.push_back(val);
-
-		cIndex++;
-	}//for
-
-	return true;
-}
-
 //Populate a alist of virtual devices defined in user lua file
-bool populate_virtual_devices(LuaScript &lScript)
+bool populate_virtual_devices(void)
 {
-	std::vector<std::array<int, 2>> dList;
-	std::array<int, 2> val;
-	int cIndex = 0;
-	while (1) {
-		bool noerr;
-
-		val[0] = lScript.get<int>("v_devices.v" + std::to_string(cIndex) + ".buttons", noerr);
-		if (!noerr) {
-			break;
-		}
-		val[1] = lScript.get<int>("v_devices.v" + std::to_string(cIndex) + ".axes", noerr);
-		if (!noerr) {
-			break;
-		}
-
-		dList.push_back(val);
-
-		cIndex++;
-	}//for
-
 	vJoy = new CVirtualJoy(1, 6);
 
 	return true;
 }
-
-//Initialize lua functions
-void link_lua_functions(LuaScript &lScript)
-{
-	lScript.pushcfunction(l_send_vjoy_axis_event,   "send_axis_event");
-	lScript.pushcfunction(l_get_vjoy_axis_status,   "get_vjoy_axis_status");
-}
-
 
 bool intialize_tracking(void)
 {
@@ -170,12 +115,6 @@ int main(int argc, char** argv)
 
 	std::cout << "WeJoy v0.2 by Johannes Bergmark\n";
 
-	if (argc < 2) {
-		std::cout << "Please type the path of your lua file.\n";
-		std::cout << "I.e. 'wejoy config.lua'\n";
-		return 0;
-	}
-
 	if (!intialize_tracking()) {
 		std::cout << "intialize_tracking failed\n";
 		return 1;
@@ -183,23 +122,13 @@ int main(int argc, char** argv)
 
 	std::cout << "intialize_tracking started!\n";
 
-	//Open the user lua file.
-	LuaScript lScript(argv[1]);
-	if (!lScript.isOpen()) {
-		return 0;
-	}
-
-	if (!populate_devices(lScript)) {
+	if (!populate_virtual_devices()) {
 		exit(0);
 	}
-	if (!populate_virtual_devices(lScript)) {
-		exit(0);
-	}
-	link_lua_functions(lScript);
 
 	std::cout << "Press 'q' and then 'ENTER' to quit!\n";
 
-	std::thread threadUpdateJoysticks(updateThreadJoysticks, std::ref(lScript));
+	std::thread threadUpdateJoysticks(updateThreadJoysticks);
 
 	while (getchar() != 'q');
 	bPoll = false,
