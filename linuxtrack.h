@@ -35,67 +35,67 @@ extern "C" {
 
 
 typedef enum {
-  LINUXTRACK_OK = 0,
-  INITIALIZING = 1,
-  RUNNING = 2,
-  PAUSED = 3,
-  STOPPED = 4,
-  //Error codes
-  err_NOT_INITIALIZED = -1,
-  err_SYMBOL_LOOKUP = -2,
-  err_NO_CONFIG = -3,
-  err_NOT_FOUND = -4,
-  err_PROCESSING_FRAME = -5
-}linuxtrack_state_type;
+	LINUXTRACK_OK = 0,
+	INITIALIZING = 1,
+	RUNNING = 2,
+	PAUSED = 3,
+	STOPPED = 4,
+	//Error codes
+	err_NOT_INITIALIZED = -1,
+	err_SYMBOL_LOOKUP = -2,
+	err_NO_CONFIG = -3,
+	err_NOT_FOUND = -4,
+	err_PROCESSING_FRAME = -5
+} linuxtrack_state_type;
 
-linuxtrack_state_type linuxtrack_init(const char *cust_section);
+linuxtrack_state_type linuxtrack_init(const char* cust_section);
 linuxtrack_state_type linuxtrack_shutdown(void);
 linuxtrack_state_type linuxtrack_suspend(void);
 linuxtrack_state_type linuxtrack_wakeup(void);
 linuxtrack_state_type linuxtrack_recenter(void);
-const char *linuxtrack_explain(linuxtrack_state_type err);
+const char* linuxtrack_explain(linuxtrack_state_type err);
 linuxtrack_state_type linuxtrack_get_tracking_state(void);
 
-int linuxtrack_get_pose(float *heading,
-                         float *pitch,
-                         float *roll,
-                         float *tx,
-                         float *ty,
-                         float *tz,
-                         uint32_t *counter);
+int linuxtrack_get_pose(float* heading,
+    float* pitch,
+    float* roll,
+    float* tx,
+    float* ty,
+    float* tz,
+    uint32_t* counter);
 
 
-typedef struct{
-  float pitch;
-  float yaw;
-  float roll;
-  float tx;
-  float ty;
-  float tz;
-  uint32_t counter;
-  uint32_t resolution_x;
-  uint32_t resolution_y;
-  float raw_pitch;
-  float raw_yaw;
-  float raw_roll;
-  float raw_tx;
-  float raw_ty;
-  float raw_tz;
-  uint8_t status;
+typedef struct {
+	float pitch;
+	float yaw;
+	float roll;
+	float tx;
+	float ty;
+	float tz;
+	uint32_t counter;
+	uint32_t resolution_x;
+	uint32_t resolution_y;
+	float raw_pitch;
+	float raw_yaw;
+	float raw_roll;
+	float raw_tx;
+	float raw_ty;
+	float raw_tz;
+	uint8_t status;
 } linuxtrack_pose_t;
 
-int linuxtrack_get_pose_full(linuxtrack_pose_t *pose, float blobs[], int num_blobs, int *blobs_read);
+int linuxtrack_get_pose_full(linuxtrack_pose_t* pose, float blobs[], int num_blobs, int* blobs_read);
 
-int linuxtrack_get_abs_pose(float *heading,
-                            float *pitch,
-                            float *roll,
-                            float *tx,
-                            float *ty,
-                            float *tz,
-                            uint32_t *counter);
+int linuxtrack_get_abs_pose(float* heading,
+    float* pitch,
+    float* roll,
+    float* tx,
+    float* ty,
+    float* tz,
+    uint32_t* counter);
 
 linuxtrack_state_type linuxtrack_request_frames(void);
-int linuxtrack_get_frame(int *req_width, int *req_height, size_t buf_size, uint8_t *buffer);
+int linuxtrack_get_frame(int* req_width, int* req_height, size_t buf_size, uint8_t* buffer);
 linuxtrack_state_type linuxtrack_notification_on(void);
 int linuxtrack_get_notify_pipe(void);
 int linuxtrack_wait(int timeout);
