@@ -9,10 +9,7 @@
 
 namespace GLOBAL
 {
-std::vector<Joystick*>    joyList;
-std::vector<CVirtualJoy*> vJoyList;
-std::vector<CKeyboard*>   kbdList;
-CVirtualKeyboard*         vKeyboard;
+    std::vector<CVirtualJoy*> vJoyList;
 }
 
 #endif
