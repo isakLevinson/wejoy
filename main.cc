@@ -1,9 +1,11 @@
+
+#include <iostream>
 #include <unistd.h> //sleep
 #include <thread>   //thread
 #include <mutex>
+#include <string>
 
-#include "LuaScript.h"
-#include "CKeyboard.h"
+//#include "CKeyboard.h"
 #include "linuxtrack.h"
 #include "CVirtualJoy.h"
 
@@ -51,27 +53,6 @@ void updateThreadJoysticks(void)
 			printf("...\n");
 		}
 	}//while
-}
-
-//Called from user via lua script
-int l_send_vjoy_axis_event(lua_State* _L)
-{
-	int type = lua_tonumber(_L, 1);
-	int value = lua_tonumber(_L, 2);
-
-	vJoy->send_axis_event(type, value);
-
-	return 0;
-}
-
-//Called from user via lua script
-int l_get_vjoy_axis_status(lua_State* L)
-{
-	int type = lua_tonumber(L, 1);
-
-	int status = vJoy->get_axis_status(type);
-	lua_pushnumber(L, status);
-	return 1;
 }
 
 //Populate a alist of virtual devices defined in user lua file
