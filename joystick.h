@@ -37,7 +37,6 @@ public:
 		return (type & JS_EVENT_BUTTON) != 0;
 	}
 
-
 	bool isAxis()          // Returns true if this event is the result of an axis movement.
 	{
 		return (type & JS_EVENT_AXIS) != 0;
