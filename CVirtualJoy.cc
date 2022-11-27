@@ -1,8 +1,18 @@
-#include "CVirtualJoy.h"
-#include "buttons_ref.h"
-#include "suinput.h"
+
 #include <cstring>               //memset
 #include <iostream>              //cout
+#include "CVirtualJoy.h"
+#include "suinput.h"
+
+static const int AXES[] = {
+	ABS_X,
+	ABS_Y,
+	ABS_Z,
+	ABS_RX,
+	ABS_RY,
+	ABS_RZ,
+};
+
 
 static int static_deviceid = 0;  //Device incrementer
 
@@ -19,22 +29,21 @@ CVirtualJoy::CVirtualJoy(unsigned int _buttons, unsigned int _axes)
 
 
 	//Setup buttons for device
-	if (_buttons > BUTTONS_SIZE) {
-		std::cout << "WARNING: Number of buttons (" << _buttons << ") for virtual device " << deviceid << " exceeds maximum allowable buttons which is " << (BUTTONS_SIZE - 1) << ".\n";
+	if (_buttons > 1) {
+		std::cout << "WARNING: Number of buttons (" << _buttons << ") for virtual device " << deviceid << " exceeds maximum allowable buttons\n";
 	}
-	for (unsigned int i = 0; i < _buttons && i < BUTTONS_SIZE; i++) {
-		if (suinput_enable_event(fd, EV_KEY, buttons_ref::BUTTONS[i]) < 0) {
-			std::cout << "ERROR: Failed enabling event for button " << i << " on virtual device << " << deviceid << ".\n";
-		}//if
-	}//if
 
-	//Setup axes for device
-
-	if (_axes > AXES_SIZE) {
-		std::cout << "WARNING: Number of axes (" << _axes << ") for virtual device " << deviceid << " exceeds maximum allowable axes which is " << (AXES_SIZE - 1) << ".\n";
+	if (_axes != 6) {
+		std::cout << "WARNING: Number of axes (" << _axes << ") for virtual device " << deviceid << " exceeds maximum allowable axes\n";
 	}
-	for (unsigned int i = 0; i < _axes && i < AXES_SIZE; i++) {
-		if (suinput_enable_event(fd, EV_ABS, buttons_ref::AXES[i]) < 0) {
+
+	// just add one button.
+	if (suinput_enable_event(fd, EV_KEY, BTN_TRIGGER) < 0) {
+		std::cout << "ERROR: Failed enabling event for button on virtual device << " << deviceid << ".\n";
+	}
+
+	for (unsigned int i = 0; i < _axes; i++) {
+		if (suinput_enable_event(fd, EV_ABS, AXES[i]) < 0) {
 			std::cout << "ERROR: Failed enabling event for axis " << i << " on virtual device << " << deviceid << ".\n";
 		}
 	}//if
@@ -46,7 +55,7 @@ CVirtualJoy::CVirtualJoy(unsigned int _buttons, unsigned int _axes)
 	std::string dName = "LinuxTrack";
 	strcpy(user_dev.name, dName.c_str());
 
-	for (unsigned int i = 0; i < _axes && i < AXES_SIZE; i++) {
+	for (unsigned int i = 0; i < _axes; i++) {
 		user_dev.absmax[i] = 32767;
 		user_dev.absmin[i] = -32767;
 	}
@@ -66,7 +75,6 @@ CVirtualJoy::CVirtualJoy(unsigned int _buttons, unsigned int _axes)
 	std::cout << "Successfully created virtual device " << deviceid << ".\n";
 	static_deviceid++;
 }
-
 
 CVirtualJoy::~CVirtualJoy()
 {
@@ -97,13 +105,13 @@ void CVirtualJoy::send_button_event(int type, int value)
 	}
 	set_button_flags(check);              //Updating button flags
 
-	suinput_emit(fd, EV_KEY, buttons_ref::BUTTONS[type], value);
+	suinput_emit(fd, EV_KEY, BTN_TRIGGER, value);
 	suinput_syn(fd);
 }
 
 void CVirtualJoy::send_axis_event(int type, int value)
 {
 	set_axis_data(type, value);
-	suinput_emit(fd, EV_ABS, buttons_ref::AXES[type], value);
+	suinput_emit(fd, EV_ABS, AXES[type], value);
 	suinput_syn(fd);
 }

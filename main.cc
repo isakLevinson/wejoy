@@ -55,14 +55,6 @@ void updateThreadJoysticks(void)
 	}//while
 }
 
-//Populate a alist of virtual devices defined in user lua file
-bool populate_virtual_devices(void)
-{
-	vJoy = new CVirtualJoy(1, 6);
-
-	return true;
-}
-
 bool intialize_tracking(void)
 {
 	linuxtrack_state_type state;
@@ -103,9 +95,7 @@ int main(int argc, char** argv)
 
 	std::cout << "intialize_tracking started!\n";
 
-	if (!populate_virtual_devices()) {
-		exit(0);
-	}
+	vJoy = new CVirtualJoy(1, 6);
 
 	std::cout << "Press 'q' and then 'ENTER' to quit!\n";
 
