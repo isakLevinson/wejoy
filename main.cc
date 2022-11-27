@@ -36,11 +36,13 @@ void updateThreadJoysticks(void)
 			x = 100 * fx;
 			y = 100 * fy;
 			z = 100 * fz;
-			r = 100 * fr;
-			p = 100 * fp;
-			h = 100 * fh;
+			r = 400 * fr;
+			p = 400 * fp;
+			h = 400 * fh;
 
-			printf("ltr: %6d %6d %6d %6d %6d %6d\n", h, p, r, x, y, z);
+			if (!(counter % 100)) {
+				printf("ltr: %6d %6d %6d %6d %6d %6d\n", x, y, z, h, p, r);
+			}
 
 			vJoy->send_axis_event(0, x);
 			vJoy->send_axis_event(1, y);
@@ -52,6 +54,8 @@ void updateThreadJoysticks(void)
 		} else {
 			printf("...\n");
 		}
+
+		counter++;
 	}//while
 }
 

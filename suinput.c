@@ -23,10 +23,7 @@
 #include <stdlib.h>
 
 #include <linux/limits.h>
-
 #include <libudev.h>
-
-
 #include "suinput.h"
 
 int suinput_write_event(int uinput_fd, const struct input_event* event_p)
