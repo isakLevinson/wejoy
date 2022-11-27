@@ -5,6 +5,7 @@
 #include "LuaScript.h"
 #include "global.h"
 #include "CKeyboard.h"
+#include "linuxtrack.h"
 
 bool bPoll = true;
 std::mutex mtx;
@@ -258,6 +259,33 @@ void link_lua_functions(LuaScript &lScript)
 	lScript.pushcfunction(l_get_vjoy_axis_status,   "get_vjoy_axis_status");
 }
 
+
+bool intialize_tracking(void)
+{
+	linuxtrack_state_type state;
+	//Initialize the tracking using Default profile
+	state = linuxtrack_init(NULL);
+	if (state < LINUXTRACK_OK) {
+		printf("%s\n", linuxtrack_explain(state));
+		return false;
+	}
+	int timeout = 0;
+	//wait up to 20 seconds for the tracker initialization
+	while (timeout < 200) {
+		state = linuxtrack_get_tracking_state();
+		printf("Status: %s\n", linuxtrack_explain(state));
+		if ((state == RUNNING) || (state == PAUSED)) {
+			return true;
+		}
+		usleep(100000);
+		++timeout;
+	}
+	printf("Linuxtrack doesn't work right!\n");
+	printf("Make sure it is installed and configured correctly.\n");
+	return false;
+}
+
+
 int main(int argc, char** argv)
 {
 	//TODO I need to search for information on which buttons and axes is required to correctly be found in applications, as sometimes i.e. axes are found in system, but not by applications.
@@ -270,6 +298,12 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
+	if (!intialize_tracking()) {
+		std::cout << "intialize_tracking failed\n";
+		return 1;
+	}
+
+	std::cout << "intialize_tracking started!\n";
 
 	//Open the user lua file.
 	LuaScript lScript(argv[1]);
@@ -300,6 +334,9 @@ int main(int argc, char** argv)
 		delete GLOBAL::kbdList[i];
 	}
 	delete GLOBAL::vKeyboard;
+
+	//stop the tracker
+	linuxtrack_shutdown();
 
 	return 0;
 }
