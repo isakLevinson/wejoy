@@ -9,6 +9,7 @@
 
 bool bPoll = true;
 std::mutex mtx;
+CVirtualJoy* vJoy;
 
 void updateThreadJoysticks(LuaScript &lScript)
 {
@@ -27,6 +28,7 @@ void updateThreadJoysticks(LuaScript &lScript)
 			if (GLOBAL::joyList[i]->readJoy(&event)) {
 				mtx.lock();
 				if (event.isButton()) {
+					printf("bton %d : %d\n", event.number, event.value);
 					lScript.call_device_function("d" + std::to_string(i) + "_b" + std::to_string(event.number) + "_event", event.value);
 				} else if (event.isAxis()) {
 					lScript.call_device_function("d" + std::to_string(i) + "_a" + std::to_string(event.number) + "_event", event.value);
@@ -37,20 +39,23 @@ void updateThreadJoysticks(LuaScript &lScript)
 
 		//state = linuxtrack_get_tracking_state();
 		retVal = linuxtrack_get_pose(&heading, &pitch, &roll, &x, &y, &z, &counter);
-		retVal = 1;
-		if (retVal) {
-			printf("ltr: %f  %f  %f %f  %f  %f\n", heading, pitch, roll, x, y, z);
-		} else {
-			printf("...\n");
-		}
+		if (LINUXTRACK_OK == retVal) {
+			if (0 == (counter % 50)) {
+				printf("%d: %4.0f %4.0f %4.0f %4.0f %4.0f %4.0f\n", counter, heading, pitch, roll, x, y, z);
+			}
 
-		event.type = JS_EVENT_AXIS;
-		lScript.call_device_function("ltr_x_event", 256 * x);
-		lScript.call_device_function("ltr_y_event", 256 * y);
-		lScript.call_device_function("ltr_z_event", 256 * z);
-		lScript.call_device_function("ltr_h_event", 256 * heading);
-		lScript.call_device_function("ltr_p_event", 256 * pitch);
-		lScript.call_device_function("ltr_r_event", 256 * roll);
+			event.type = JS_EVENT_AXIS;
+			lScript.call_device_function("ltr_x_event", 256 * x);
+			lScript.call_device_function("ltr_y_event", 256 * y);
+			lScript.call_device_function("ltr_z_event", 256 * z);
+			lScript.call_device_function("ltr_h_event", 256 * heading);
+			lScript.call_device_function("ltr_p_event", 256 * pitch);
+			lScript.call_device_function("ltr_r_event", 256 * roll);
+
+		} else {
+			//printf("... %d\n", retVal);
+		}
+		counter++;
 	}//while
 }
 
@@ -118,30 +123,20 @@ int l_get_joy_axis_status(lua_State* L)
 //Called from user via lua script
 int l_send_vjoy_button_event(lua_State* _L)
 {
-	unsigned int id = lua_tonumber(_L, 1);
 	int type = lua_tonumber(_L, 2);
 	int value = lua_tonumber(_L, 3);
 
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR send_vjoy_button_event: Virtual device " << id << " does not exist.\n";
-		return 0;
-	}//if
-	GLOBAL::vJoyList[id]->send_button_event(type, value);
+	vJoy->send_button_event(type, value);
 	return 0;
 }
 
 //Called from user via lua script
 int l_send_vjoy_axis_event(lua_State* _L)
 {
-	unsigned int id = lua_tonumber(_L, 1);
 	int type = lua_tonumber(_L, 2);
 	int value = lua_tonumber(_L, 3);
 
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR send_vjoy_axis_event: Virtual device " << id << " does not exist.\n";
-		return 0;
-	}//if
-	GLOBAL::vJoyList[id]->send_axis_event(type, value);
+	vJoy->send_axis_event(type, value);
 
 	return 0;
 }
@@ -149,14 +144,9 @@ int l_send_vjoy_axis_event(lua_State* _L)
 //Called from user via lua script
 int l_get_vjoy_button_status(lua_State* L)
 {
-	unsigned int id = lua_tonumber(L, 1);
 	int type = lua_tonumber(L, 2);
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR get_vjoy_button_status: Virtual device " << id << " does not exist.\n";
-		lua_pushnumber(L, -1);
-		return 1;
-	}
-	int status = GLOBAL::vJoyList[id]->get_button_status(type);
+
+	int status = vJoy->get_button_status(type);
 	lua_pushnumber(L, status);
 	return 1;
 }
@@ -165,14 +155,9 @@ int l_get_vjoy_button_status(lua_State* L)
 //Called from user via lua script
 int l_get_vjoy_axis_status(lua_State* L)
 {
-	unsigned int id = lua_tonumber(L, 1);
 	int type = lua_tonumber(L, 2);
-	if (id >= GLOBAL::vJoyList.size()) {
-		std::cout << "ERROR get_vjoy_axis_status: Virtual device " << id << " does not exist.\n";
-		lua_pushnumber(L, -1);
-		return 1;
-	}
-	int status = GLOBAL::vJoyList[id]->get_axis_status(type);
+
+	int status = vJoy->get_axis_status(type);
 	lua_pushnumber(L, status);
 	return 1;
 }
@@ -254,14 +239,7 @@ bool populate_virtual_devices(LuaScript &lScript)
 		cIndex++;
 	}//for
 
-	//Create and populate the list of user defined virtual devices
-	for (unsigned int i = 0; i < dList.size(); i++) {
-		CVirtualJoy* vJoy = new CVirtualJoy(dList[i][0], dList[i][1]);
-		if (!vJoy->isOpen()) {
-			return false;
-		}
-		GLOBAL::vJoyList.push_back(vJoy);
-	}//for
+	vJoy = new CVirtualJoy(1, 6);
 
 	GLOBAL::vKeyboard = new CVirtualKeyboard();
 
