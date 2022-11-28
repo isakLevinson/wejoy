@@ -66,35 +66,52 @@ function d0_b1_event(value)
    end
 end
 
+local gainShift    = 300;
+local gainRotation = 100;
+
 -- Send a button 2 event to virtual device 0 when button 2 on physical device 0 is pressed and released.
-function d0_b2_event(value)
+function d0_b31_event(value)
    if value == 1 then
-      send_button_event(0, 2, 1)
-   else
-      send_button_event(0, 2, 0)
+      gainRotation   = 100;
+      gainShift      = 300;
+   end
+end
+
+function d0_b32_event(value)
+   if value == 1 then
+      gainRotation   = 0;
+      gainShift      = 0;
+      ltr_recenter(0, 0, 0)
+   end
+end
+
+function d0_b33_event(value)
+   if value == 1 then
+      gainRotation   = 20;
+      gainShift      = 60;
    end
 end
 
 function ltr_x_event(value)
-   send_axis_event(0, 0, value)
+   send_axis_event(0, 0, -gainShift * value)
 end
 
 function ltr_y_event(value)
-   send_axis_event(0, 1, value)
+   send_axis_event(0, 1, gainShift * value)
 end
 
 function ltr_z_event(value)
-   send_axis_event(0, 2, value)
+   send_axis_event(0, 2, gainShift * value)
 end
 
-function ltr_h_event(value)
-   send_axis_event(0, 3, value)
+function ltr_rx_event(value)
+   send_axis_event(0, 3, -gainRotation * value)
 end
 
-function ltr_p_event(value)
-   send_axis_event(0, 4, value)
+function ltr_ry_event(value)
+   send_axis_event(0, 4, -gainRotation * value)
 end
 
-function ltr_r_event(value)
-   send_axis_event(0, 5, value)
+function ltr_rz_event(value)
+   send_axis_event(0, 5, gainRotation * value)
 end

@@ -15,7 +15,7 @@ void updateThreadJoysticks(LuaScript &lScript)
 {
 	int retVal;
 	//linuxtrack_state_type state;
-	float heading, pitch, roll, x, y, z;
+	float x, y, z, rx, ry, rz;
 	unsigned int counter;
 
 	//Sleep one second to give the X11 system time to adapt.
@@ -38,19 +38,18 @@ void updateThreadJoysticks(LuaScript &lScript)
 		}//for
 
 		//state = linuxtrack_get_tracking_state();
-		retVal = linuxtrack_get_pose(&heading, &pitch, &roll, &x, &y, &z, &counter);
+		retVal = linuxtrack_get_pose(&rx, &ry, &rz, &x, &y, &z, &counter);
 		if (LINUXTRACK_OK == retVal) {
 			if (0 == (counter % 50)) {
-				printf("%d: %4.0f %4.0f %4.0f %4.0f %4.0f %4.0f\n", counter, heading, pitch, roll, x, y, z);
+				printf("rx:%4.0f ry:%4.0f rz:%4.0f x:%4.0f y:%4.0f z:%4.0f\n", rx, ry, rz, x, y, z);
 			}
 
-			event.type = JS_EVENT_AXIS;
-			lScript.call_device_function("ltr_x_event", 256 * x);
-			lScript.call_device_function("ltr_y_event", 256 * y);
-			lScript.call_device_function("ltr_z_event", 256 * z);
-			lScript.call_device_function("ltr_h_event", 256 * heading);
-			lScript.call_device_function("ltr_p_event", 256 * pitch);
-			lScript.call_device_function("ltr_r_event", 256 * roll);
+			lScript.call_device_function("ltr_x_event", x);
+			lScript.call_device_function("ltr_y_event", y);
+			lScript.call_device_function("ltr_z_event", z);
+			lScript.call_device_function("ltr_rx_event", rx);
+			lScript.call_device_function("ltr_ry_event", ry);
+			lScript.call_device_function("ltr_rz_event", rz);
 
 		} else {
 			//printf("... %d\n", retVal);
@@ -140,6 +139,14 @@ int l_send_vjoy_axis_event(lua_State* _L)
 
 	return 0;
 }
+
+int l_ltr_recenter(lua_State* _L)
+{
+	printf("recenter\n");
+	linuxtrack_recenter();
+	return 0;
+}
+
 
 //Called from user via lua script
 int l_get_vjoy_button_status(lua_State* L)
@@ -256,6 +263,10 @@ void link_lua_functions(LuaScript &lScript)
 	lScript.pushcfunction(l_get_joy_axis_status,    "get_axis_status");
 	lScript.pushcfunction(l_get_vjoy_button_status, "get_vjoy_button_status");
 	lScript.pushcfunction(l_get_vjoy_axis_status,   "get_vjoy_axis_status");
+	lScript.pushcfunction(l_ltr_recenter,           "ltr_recenter");
+
+
+
 }
 
 
