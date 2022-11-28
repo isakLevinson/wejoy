@@ -48,6 +48,21 @@ typedef enum {
 	err_PROCESSING_FRAME = -5
 } linuxtrack_state_type;
 
+typedef union {
+	struct {
+		float	x;
+		float	y;
+		float	z;
+		float	rx;
+		float	ry;
+		float	rz;
+	} axes;
+
+	float array[6];
+} ltr_axes;
+
+
+
 linuxtrack_state_type linuxtrack_init(const char* cust_section);
 linuxtrack_state_type linuxtrack_shutdown(void);
 linuxtrack_state_type linuxtrack_suspend(void);
@@ -55,14 +70,7 @@ linuxtrack_state_type linuxtrack_wakeup(void);
 linuxtrack_state_type linuxtrack_recenter(void);
 const char* linuxtrack_explain(linuxtrack_state_type err);
 linuxtrack_state_type linuxtrack_get_tracking_state(void);
-
-int linuxtrack_get_pose(float* heading,
-    float* pitch,
-    float* roll,
-    float* tx,
-    float* ty,
-    float* tz,
-    uint32_t* counter);
+int linuxtrack_get_pose(ltr_axes* pVal, uint32_t* counter);
 
 
 typedef struct {

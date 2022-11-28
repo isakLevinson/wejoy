@@ -100,15 +100,28 @@ std::vector<std::string> LuaScript::getTableKeys(const std::string &name)
 	return strings;
 }
 
-
-//void LuaScript::call_device_function(const device_function& df, int value)
 void LuaScript::call_device_function(const std::string &str_func, int value)
 {
-	//lua_getglobal(L, df.lfCall.c_str());
 	lua_getglobal(L, str_func.c_str());
 	lua_pushnumber(L, value);
 	lua_pcall(L, 1, 0, 0); //Lua handle, number of arguments, number of return values, error code
 }
+
+void LuaScript::call_device_function_fn(const std::string &str_func, float* pValue, int count)
+{
+	int	retVal;
+	int i;
+
+	lua_getglobal(L, str_func.c_str());
+
+	for (i = 0; i < count; i++) {
+		lua_pushnumber(L, pValue[i]);
+	}
+
+	retVal = lua_pcall(L, count, 0, 0); //Lua handle, number of arguments, number of return values, error code
+	printf("call_device_function_fn %d\n", retVal);
+}
+
 
 void LuaScript::pushcfunction(int (*_func)(lua_State*), const std::string &_name)
 {

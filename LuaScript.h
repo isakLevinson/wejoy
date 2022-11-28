@@ -21,8 +21,10 @@ public:
 	std::vector<int> getIntVector(const std::string &name);
 	std::vector<std::string> getStringVector(const std::string &name);
 	std::vector<std::string> getTableKeys(const std::string &name);
-	//void call_device_function(const device_function&, int);
-	void call_device_function(const std::string &, int);
+
+	void call_device_function(const std::string &str_func, int value);
+	void call_device_function_fn(const std::string &str_func, float* pValue, int count);
+
 	void pushcfunction(int (*)(lua_State*), const std::string &);
 	bool isOpen()
 	{

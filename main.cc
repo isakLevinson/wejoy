@@ -15,7 +15,8 @@ void updateThreadJoysticks(LuaScript &lScript)
 {
 	int retVal;
 	//linuxtrack_state_type state;
-	float x, y, z, rx, ry, rz;
+	ltr_axes  axes;
+
 	unsigned int counter;
 
 	//Sleep one second to give the X11 system time to adapt.
@@ -38,18 +39,16 @@ void updateThreadJoysticks(LuaScript &lScript)
 		}//for
 
 		//state = linuxtrack_get_tracking_state();
-		retVal = linuxtrack_get_pose(&rx, &ry, &rz, &x, &y, &z, &counter);
+		retVal = linuxtrack_get_pose(&axes, &counter);
 		if (LINUXTRACK_OK == retVal) {
+
 			if (0 == (counter % 50)) {
-				printf("rx:%4.0f ry:%4.0f rz:%4.0f x:%4.0f y:%4.0f z:%4.0f\n", rx, ry, rz, x, y, z);
+				printf("rx:%4.0f ry:%4.0f rz:%4.0f x:%4.0f y:%4.0f z:%4.0f\n",
+				    axes.axes.rx, axes.axes.ry, axes.axes.rz,
+				    axes.axes.x, axes.axes.y, axes.axes.z);
 			}
 
-			lScript.call_device_function("ltr_x_event", x);
-			lScript.call_device_function("ltr_y_event", y);
-			lScript.call_device_function("ltr_z_event", z);
-			lScript.call_device_function("ltr_rx_event", rx);
-			lScript.call_device_function("ltr_ry_event", ry);
-			lScript.call_device_function("ltr_rz_event", rz);
+			lScript.call_device_function_fn("ltr_event", axes.array, 6);
 
 		} else {
 			//printf("... %d\n", retVal);
@@ -134,6 +133,8 @@ int l_send_vjoy_axis_event(lua_State* _L)
 {
 	int type = lua_tonumber(_L, 2);
 	int value = lua_tonumber(_L, 3);
+
+	printf("send_axis_event: %d, %d\n", type, value);
 
 	vJoy->send_axis_event(type, value);
 

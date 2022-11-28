@@ -92,26 +92,11 @@ function d0_b33_event(value)
    end
 end
 
-function ltr_x_event(value)
-   send_axis_event(0, 0, -gainShift * value)
-end
-
-function ltr_y_event(value)
-   send_axis_event(0, 1, gainShift * value)
-end
-
-function ltr_z_event(value)
-   send_axis_event(0, 2, gainShift * value)
-end
-
-function ltr_rx_event(value)
-   send_axis_event(0, 3, -gainRotation * value)
-end
-
-function ltr_ry_event(value)
-   send_axis_event(0, 4, -gainRotation * value)
-end
-
-function ltr_rz_event(value)
-   send_axis_event(0, 5, gainRotation * value)
+function ltr_event(x, y, z, rx, ry, rz)
+   send_axis_event(0, 0, -gainShift * x)
+   send_axis_event(0, 1,  gainShift * y)
+   send_axis_event(0, 2,  gainShift * z)
+   send_axis_event(0, 3, -gainRotation * rx)
+   send_axis_event(0, 4, -gainRotation * ry)
+   send_axis_event(0, 5,  gainRotation * rz)
 end

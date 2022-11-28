@@ -187,22 +187,15 @@ linuxtrack_state_type linuxtrack_recenter(void)
 	return ltr_recenter_fun();
 }
 
-
 //RetVal 0 means no new data
-int linuxtrack_get_pose(float* heading,
-    float* pitch,
-    float* roll,
-    float* tx,
-    float* ty,
-    float* tz,
-    uint32_t* counter)
+int linuxtrack_get_pose(ltr_axes* pVal, uint32_t* counter)
 {
 	if (ltr_get_pose_fun == NULL) {
-		*heading = *pitch = *roll = *tx = *ty = *tz = 0.0f;
+		memset(pVal->array, 0, sizeof(pVal->array));
 		*counter = 0;
 		return 0;
 	}
-	return ltr_get_pose_fun(heading, pitch, roll, tx, ty, tz, counter);
+	return ltr_get_pose_fun(&pVal->axes.rx, &pVal->axes.ry, &pVal->axes.rz, &pVal->axes.x, &pVal->axes.y, &pVal->axes.z, counter);
 }
 
 //RetVal 0 means no new data
