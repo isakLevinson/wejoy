@@ -43,9 +43,9 @@ void updateThreadJoysticks(LuaScript &lScript)
 		if (LINUXTRACK_OK == retVal) {
 
 			if (0 == (counter % 50)) {
-				printf("rx:%4.0f ry:%4.0f rz:%4.0f x:%4.0f y:%4.0f z:%4.0f\n",
-				    axes.axes.rx, axes.axes.ry, axes.axes.rz,
-				    axes.axes.x, axes.axes.y, axes.axes.z);
+				//printf("rx:%4.0f ry:%4.0f rz:%4.0f x:%4.0f y:%4.0f z:%4.0f\n",
+				//    axes.axes.rx, axes.axes.ry, axes.axes.rz,
+				//    axes.axes.x, axes.axes.y, axes.axes.z);
 			}
 
 			lScript.call_device_function_fn("ltr_event", axes.array, 6);
@@ -128,7 +128,6 @@ int l_send_vjoy_button_event(lua_State* _L)
 	return 0;
 }
 
-//Called from user via lua script
 int l_send_vjoy_axis_event(lua_State* _L)
 {
 	int type = lua_tonumber(_L, 2);
@@ -140,6 +139,30 @@ int l_send_vjoy_axis_event(lua_State* _L)
 
 	return 0;
 }
+
+int l_send_axis_events(lua_State* _L)
+{
+	int i;
+	int val[6];
+	static int counter = 0;
+
+	for (i = 0; i < 6; i++) {
+		val[i] = lua_tonumber(_L, i + 1);
+	}
+
+	if (!(counter % 50)) {
+		printf("send_axis_events: %d, %d %d %d %d %d\n", val[0], val[1], val[2], val[3], val[4], val[5]);
+	}
+
+	for (i = 0; i < 6; i++) {
+		vJoy->send_axis_event(i, val[i]);
+	}
+
+	counter++;
+
+	return 0;
+}
+
 
 int l_ltr_recenter(lua_State* _L)
 {
@@ -259,6 +282,7 @@ void link_lua_functions(LuaScript &lScript)
 {
 	lScript.pushcfunction(l_send_vjoy_button_event, "send_button_event");
 	lScript.pushcfunction(l_send_vjoy_axis_event,   "send_axis_event");
+	lScript.pushcfunction(l_send_axis_events,       "send_axis_events");
 	lScript.pushcfunction(l_send_keyboard_event,    "send_keyboard_event");
 	lScript.pushcfunction(l_get_joy_button_status,  "get_button_status");
 	lScript.pushcfunction(l_get_joy_axis_status,    "get_axis_status");
