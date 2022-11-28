@@ -43,7 +43,7 @@ CVirtualJoy::CVirtualJoy(unsigned int _buttons, unsigned int _axes)
 	//Create and initialize the device
 	struct uinput_user_dev user_dev;
 	memset(&user_dev, 0, sizeof(struct uinput_user_dev));
-	std::string dName = "WeJoy Virtual Device " + std::to_string(deviceid);
+	std::string dName = "LinuxTrack";
 	strcpy(user_dev.name, dName.c_str());
 
 	for (unsigned int i = 0; i < _axes && i < AXES_SIZE; i++) {

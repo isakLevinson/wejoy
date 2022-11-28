@@ -12,6 +12,11 @@ std::mutex mtx;
 
 void updateThreadJoysticks(LuaScript &lScript)
 {
+	int retVal;
+	//linuxtrack_state_type state;
+	float heading, pitch, roll, x, y, z;
+	unsigned int counter;
+
 	//Sleep one second to give the X11 system time to adapt.
 	sleep(1);
 
@@ -28,8 +33,24 @@ void updateThreadJoysticks(LuaScript &lScript)
 				}
 				mtx.unlock();
 			}//if
-
 		}//for
+
+		//state = linuxtrack_get_tracking_state();
+		retVal = linuxtrack_get_pose(&heading, &pitch, &roll, &x, &y, &z, &counter);
+		retVal = 1;
+		if (retVal) {
+			printf("ltr: %f  %f  %f %f  %f  %f\n", heading, pitch, roll, x, y, z);
+		} else {
+			printf("...\n");
+		}
+
+		event.type = JS_EVENT_AXIS;
+		lScript.call_device_function("ltr_x_event", 256 * x);
+		lScript.call_device_function("ltr_y_event", 256 * y);
+		lScript.call_device_function("ltr_z_event", 256 * z);
+		lScript.call_device_function("ltr_h_event", 256 * heading);
+		lScript.call_device_function("ltr_p_event", 256 * pitch);
+		lScript.call_device_function("ltr_r_event", 256 * roll);
 	}//while
 }
 
@@ -274,14 +295,15 @@ bool intialize_tracking(void)
 	while (timeout < 200) {
 		state = linuxtrack_get_tracking_state();
 		printf("Status: %s\n", linuxtrack_explain(state));
+		//std::cout << "Status: ", linuxtrack_explain(state), "\n";
 		if ((state == RUNNING) || (state == PAUSED)) {
 			return true;
 		}
 		usleep(100000);
 		++timeout;
 	}
-	printf("Linuxtrack doesn't work right!\n");
-	printf("Make sure it is installed and configured correctly.\n");
+	std::cout << "Linuxtrack doesn't work right!\n";
+	std::cout << "Make sure it is installed and configured correctly.\n";
 	return false;
 }
 

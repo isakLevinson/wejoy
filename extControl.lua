@@ -17,8 +17,8 @@ v_devices =
    {
       v0 = 
 	 {
-	    buttons = 3,
-	    axes = 2
+	    buttons = 0,
+	    axes = 6
 	 }
    }
 
@@ -85,18 +85,32 @@ function d0_b2_event(value)
    end
 end
 
--- When axis 0 on device 0 is changed, set the axis 0 on virtual device 0, inverted or not depending on button 1 on device 0.
-function d0_a0_event(value)
-   d0_b1 = get_button_status(0, 1)
-   if d0_b1 == 1 then	send_axis_event(0, 0, -value)
-   else send_axis_event(0, 0, value)
-   end
+function ltr_x_event(value)
+   send_axis_event(0, 0, value)
 end
 
--- When axis 1 on device 0 is changed, set the axis 1 on virtual device 0, inverted or not depending on button 1 on device 0.
-function d0_a1_event(value)
-   d0_b1 = get_button_status(0, 1)
-   if d0_b1 == 1 then	send_axis_event(0, 1, -value)
-   else send_axis_event(0, 1, value)
-   end
+function ltr_y_event(value)
+   send_axis_event(0, 1, value)
 end
+
+function ltr_z_event(value)
+   send_axis_event(0, 2, value)
+end
+
+function ltr_h_event(value)
+   send_axis_event(0, 3, value)
+end
+
+function ltr_p_event(value)
+   send_axis_event(0, 4, value)
+end
+
+function ltr_r_event(value)
+   send_axis_event(0, 5, value)
+end
+
+
+function ltr_xxx_event(value)
+   send_axis_event(0, 6, value)
+end
+
