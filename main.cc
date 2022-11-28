@@ -31,17 +31,18 @@ void updateThreadJoysticks(void)
 
 		//state = linuxtrack_get_tracking_state();
 		retVal = linuxtrack_get_pose(&fh, &fp, &fr, &fx, &fy, &fz, &counter);
-		retVal = 1;
-		if (retVal) {
-			x = 100 * fx;
-			y = 100 * fy;
-			z = 100 * fz;
-			r = 400 * fr;
-			p = 400 * fp;
-			h = 400 * fh;
+		//retVal = 1;
+		if (!retVal) {
+			x = -100 * fx;
+			y =  100 * fy;
+			z =  100 * fz;
+			r = -100 * fr;
+			p = -100 * fp;
+			h = -100 * fh;
 
-			if (!(counter % 100)) {
-				printf("ltr: %6d %6d %6d %6d %6d %6d\n", x, y, z, h, p, r);
+			if (0 == (counter % 50)) {
+				printf("x:%4.0f y:%4.0f z:%4.0f rx:%4.0f ry:%4.0f rz:%4.0f\n", fx, fy, fz, fh, fp, fr);
+				//printf("%8d: x:%6d y:%6d z:%6d %6d %6d %6d\n", counter, x, y, z, h, p, r);
 			}
 
 			vJoy->send_axis_event(0, x);
@@ -52,7 +53,7 @@ void updateThreadJoysticks(void)
 			vJoy->send_axis_event(5, r);
 
 		} else {
-			printf("...\n");
+			//printf("...\n");
 		}
 
 		counter++;
