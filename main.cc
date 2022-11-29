@@ -29,7 +29,7 @@ void updateThreadJoysticks(LuaScript &lScript)
 			if (GLOBAL::joyList[i]->readJoy(&event)) {
 				mtx.lock();
 				if (event.isButton()) {
-					printf("bton %d : %d\n", event.number, event.value);
+					printf("bton %d %d : %d\n", i, event.number, event.value);
 					lScript.call_device_function("d" + std::to_string(i) + "_b" + std::to_string(event.number) + "_event", event.value);
 				} else if (event.isAxis()) {
 					lScript.call_device_function("d" + std::to_string(i) + "_a" + std::to_string(event.number) + "_event", event.value);
@@ -193,7 +193,6 @@ int l_get_vjoy_axis_status(lua_State* L)
 	return 1;
 }
 
-
 //Populate a list of physical devices defined in user lua file
 bool populate_devices(LuaScript &lScript)
 {
@@ -289,9 +288,6 @@ void link_lua_functions(LuaScript &lScript)
 	lScript.pushcfunction(l_get_vjoy_button_status, "get_vjoy_button_status");
 	lScript.pushcfunction(l_get_vjoy_axis_status,   "get_vjoy_axis_status");
 	lScript.pushcfunction(l_ltr_recenter,           "ltr_recenter");
-
-
-
 }
 
 
