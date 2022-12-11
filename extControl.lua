@@ -1,18 +1,22 @@
 --Physical devices to use (type lsusb in terminal to list your connected devices)
 devices = 
-   {
-      d0 = --Thrustmaster Warthog Joystick
-	 {
-	    vendorid = 0x0738,
-	    productid = 0x2215,
-	 },
+{
+   d0 = -- throttle
+	{
+	    vendorid = 0x3344,
+       productid = 0x8198,
+   },
 
-      kbd0 = "/dev/input/by-id/usb-04d9_USB_Keyboard-event-kbd",  -- keyboard device (try to find a suitable device by listing input devices by typing 'ls /dev/input/by-id/' )
-      kbd1 = "/dev/input/by-id/usb-Aqua_Computer_GmbH___Co._KG_aquaero_07538-20376-event-kbd" -- another keyboard device example
-   }
+   d1 = -- stick
+	{
+	    vendorid = 0x3344,
+	    productid = 0x40cb,
+	},
 
---Virtual devices to create, current limit is maximum 53 (0 to 52) buttons and 19 (0 to 18) axes. Note that not every button or axis is fully tested to work.
---Creating more than one virtual devices is possible, making room for more buttons and axes.
+--  kbd0 = "/dev/input/by-id/usb-04d9_USB_Keyboard-event-kbd",  -- keyboard device (try to find a suitable device by listing input devices by typing 'ls /dev/input/by-id/' )
+--  kbd1 = "/dev/input/by-id/usb-Aqua_Computer_GmbH___Co._KG_aquaero_07538-20376-event-kbd" -- another keyboard device example
+}
+
 v_devices = 
    {
       v0 = 
@@ -21,6 +25,8 @@ v_devices =
 	    axes = 6
 	 }
    }
+
+
 
 -- Send method for keyboard. Key is given, i.e. KEY_G (check reference document for more supported key-codes), and state is given, i.e. 0 for release or 1 for press.
 -- send_keyboard_event(key, state)
@@ -37,80 +43,45 @@ v_devices =
 -- get_vjoy_button_status(vjoy, button)
 -- get_vjoy_axis_status(vjoy, axis)
 
-function kbd0_pressed(value)
-   if value == KEY_W then
-      send_button_event(0, 1, 1)
-   end
-end
 
-function kbd0_released(value)
-   if value == KEY_W then
-      send_button_event(0, 1, 0)
-   end
-end
+local gainShift    = 300;
+local gainRotation = 100;
+local offsetZ      = 0;
 
--- Send a button 0 event to virtual device 0 when button 0 on physical device 0 is pressed and released.
-function d0_b0_event(value)
+function d0_b31_event(value)
    if value == 1 then
-      send_button_event(0, 0, 1)
-   else
-      send_button_event(0, 0, 0)
+      gainRotation   = 100;
+      gainShift      = 300;
    end
 end
 
--- When button 1 on device 0 is pressed, invert virtual axes 0 and 1 on virtual device 0, otherwise these axes is as the first two axes on physical device 0.
--- Send a button 1 event to virtual device 0 when button 1 on physical device 0 is pressed and released.
-function d0_b1_event(value)
+function d0_b32_event(value)
    if value == 1 then
-      send_button_event(0, 1, 1)
-      x = get_axis_status(0, 0)
-      y = get_axis_status(0, 1)
-      send_axis_event(0, 0, -x)
-      send_axis_event(0, 1, -y)
-   else
-      send_button_event(0, 1, 0)
-      x = get_axis_status(0, 0)
-      y = get_axis_status(0, 1)
-      send_axis_event(0, 0, x)
-      send_axis_event(0, 1, y)
+      gainRotation   = 0;
+      gainShift      = 0;
+      ltr_recenter()
    end
 end
 
--- Send a button 2 event to virtual device 0 when button 2 on physical device 0 is pressed and released.
-function d0_b2_event(value)
+function d0_b33_event(value)
    if value == 1 then
-      send_button_event(0, 2, 1)
-   else
-      send_button_event(0, 2, 0)
+      gainRotation   = 20;
+      gainShift      = 60;
    end
 end
 
-function ltr_x_event(value)
-   send_axis_event(0, 0, value)
+function d0_a5_event(value)
+   offsetZ = value;
 end
 
-function ltr_y_event(value)
-   send_axis_event(0, 1, value)
-end
+function ltr_event(x, y, z, rx, ry, rz)
+   send_axis_events(
+      -gainShift * x,
+      gainShift * y,
+      gainShift * z + offsetZ,
+      -gainRotation * rx,
+      -gainRotation * ry,
+      gainRotation * rz)
 
-function ltr_z_event(value)
-   send_axis_event(0, 2, value)
-end
-
-function ltr_h_event(value)
-   send_axis_event(0, 3, value)
-end
-
-function ltr_p_event(value)
-   send_axis_event(0, 4, value)
-end
-
-function ltr_r_event(value)
-   send_axis_event(0, 5, value)
-end
-
-
-function ltr_xxx_event(value)
-   send_axis_event(0, 6, value)
 end
 
