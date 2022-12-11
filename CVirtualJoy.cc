@@ -6,7 +6,7 @@
 
 static int static_deviceid = 0;  //Device incrementer
 
-CVirtualJoy::CVirtualJoy(unsigned int _buttons, unsigned int _axes)
+CVirtualJoy::CVirtualJoy(std::string name, unsigned int _buttons, unsigned int _axes)
 {
 	deviceid = static_deviceid;
 
@@ -43,8 +43,8 @@ CVirtualJoy::CVirtualJoy(unsigned int _buttons, unsigned int _axes)
 	//Create and initialize the device
 	struct uinput_user_dev user_dev;
 	memset(&user_dev, 0, sizeof(struct uinput_user_dev));
-	std::string dName = "LinuxTrack";
-	strcpy(user_dev.name, dName.c_str());
+
+	strcpy(user_dev.name, name.c_str());
 
 	for (unsigned int i = 0; i < _axes && i < AXES_SIZE; i++) {
 		user_dev.absmax[i] = 32767;
@@ -63,7 +63,7 @@ CVirtualJoy::CVirtualJoy(unsigned int _buttons, unsigned int _axes)
 		return;
 	}//if
 
-	std::cout << "Successfully created virtual device " << deviceid << ".\n";
+	std::cout << "Successfully created virtual device " << name.c_str() << deviceid << ".\n";
 	static_deviceid++;
 }
 

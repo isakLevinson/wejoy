@@ -234,33 +234,35 @@ bool populate_devices(LuaScript &lScript)
 //Populate a alist of virtual devices defined in user lua file
 bool populate_virtual_devices(LuaScript &lScript)
 {
-	std::vector<std::array<int, 2>> dList;
-	std::array<int, 2> val;
 	int cIndex = 0;
 	while (1) {
 		bool noerr;
 
-		val[0] = lScript.get<int>("v_devices.v" + std::to_string(cIndex) + ".buttons", noerr);
+		int bottons;
+		int axes;
+		std::string name;
+
+		name = lScript.get<std::string>("v_devices.v" + std::to_string(cIndex) + ".name", noerr);
+		if (!noerr) {
+			name = "virt" + std::to_string(cIndex);
+		}
+
+		bottons = lScript.get<int>("v_devices.v" + std::to_string(cIndex) + ".buttons", noerr);
 		if (!noerr) {
 			break;
 		}
-		val[1] = lScript.get<int>("v_devices.v" + std::to_string(cIndex) + ".axes", noerr);
+		axes = lScript.get<int>("v_devices.v" + std::to_string(cIndex) + ".axes", noerr);
 		if (!noerr) {
 			break;
 		}
 
-		dList.push_back(val);
-
-		cIndex++;
-	}//for
-
-	//Create and populate the list of user defined virtual devices
-	for (unsigned int i = 0; i < dList.size(); i++) {
-		CVirtualJoy* vJoy = new CVirtualJoy(dList[i][0], dList[i][1]);
+		CVirtualJoy* vJoy = new CVirtualJoy(name, bottons, axes);
 		if (!vJoy->isOpen()) {
 			return false;
 		}
 		GLOBAL::vJoyList.push_back(vJoy);
+
+		cIndex++;
 	}//for
 
 	GLOBAL::vKeyboard = new CVirtualKeyboard();

@@ -19,11 +19,20 @@ devices =
 
 v_devices = 
    {
-      v0 = 
+    v0 = 
 	 {
-	    buttons = 0,
+       name = "LinuxTrack",
+	    buttons = 1,
 	    axes = 6
+	 },
+
+    v1 = 
+	 {
+       name = "VIRPIL buttons",
+	    buttons = 32,
+	    axes = 2
 	 }
+
    }
 
 

@@ -4,6 +4,8 @@
 #include <vector>
 #include "suinput.h"
 
+#include <iostream>              //cout
+
 class CVirtualJoy
 {
 private:
@@ -35,7 +37,7 @@ public:
 	void send_axis_event(int, int);
 	int getDeviceid();
 	bool isOpen();
-	CVirtualJoy(unsigned int, unsigned int);                   //buttons, axes
+	CVirtualJoy(std::string, unsigned int, unsigned int);
 	~CVirtualJoy();
 };
 
