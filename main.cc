@@ -14,7 +14,8 @@ void updateThreadJoysticks(LuaScript &lScript)
 {
 	int retVal;
 	//linuxtrack_state_type state;
-	float heading, pitch, roll, x, y, z;
+	ltr_axes  axes;
+
 	unsigned int counter;
 
 	//Sleep one second to give the X11 system time to adapt.
@@ -27,6 +28,7 @@ void updateThreadJoysticks(LuaScript &lScript)
 			if (GLOBAL::joyList[i]->readJoy(&event)) {
 				mtx.lock();
 				if (event.isButton()) {
+					printf("bton %d : %d\n", event.number, event.value);
 					lScript.call_device_function("d" + std::to_string(i) + "_b" + std::to_string(event.number) + "_event", event.value);
 				} else if (event.isAxis()) {
 					lScript.call_device_function("d" + std::to_string(i) + "_a" + std::to_string(event.number) + "_event", event.value);
@@ -36,21 +38,21 @@ void updateThreadJoysticks(LuaScript &lScript)
 		}//for
 
 		//state = linuxtrack_get_tracking_state();
-		retVal = linuxtrack_get_pose(&heading, &pitch, &roll, &x, &y, &z, &counter);
-		retVal = 1;
-		if (retVal) {
-			printf("ltr: %f  %f  %f %f  %f  %f\n", heading, pitch, roll, x, y, z);
-		} else {
-			printf("...\n");
-		}
+		retVal = linuxtrack_get_pose(&axes, &counter);
+		if (LINUXTRACK_OK == retVal) {
 
-		event.type = JS_EVENT_AXIS;
-		lScript.call_device_function("ltr_x_event", 256 * x);
-		lScript.call_device_function("ltr_y_event", 256 * y);
-		lScript.call_device_function("ltr_z_event", 256 * z);
-		lScript.call_device_function("ltr_h_event", 256 * heading);
-		lScript.call_device_function("ltr_p_event", 256 * pitch);
-		lScript.call_device_function("ltr_r_event", 256 * roll);
+			if (0 == (counter % 50)) {
+				printf("rx:%4.0f ry:%4.0f rz:%4.0f x:%4.0f y:%4.0f z:%4.0f\n",
+				    axes.axes.rx, axes.axes.ry, axes.axes.rz,
+				    axes.axes.x, axes.axes.y, axes.axes.z);
+			}
+
+			lScript.call_device_function_fn("ltr_event", axes.array, 6);
+
+		} else {
+			//printf("... %d\n", retVal);
+		}
+		counter++;
 	}//while
 }
 
