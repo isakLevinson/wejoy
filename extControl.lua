@@ -3,14 +3,14 @@ devices =
 {
    d0 = -- throttle
 	{
-	    vendorid = 0x0738,
-       productid = 0xa215,
+	    vendorid = 0x3344,
+       productid = 0x8198,
    },
 
    d1 = -- stick
 	{
-	    vendorid = 0x0738,
-	    productid = 0x2215,
+	    vendorid = 0x3344,
+	    productid = 0x40cb,
 	},
 
 --  kbd0 = "/dev/input/by-id/usb-04d9_USB_Keyboard-event-kbd",  -- keyboard device (try to find a suitable device by listing input devices by typing 'ls /dev/input/by-id/' )
