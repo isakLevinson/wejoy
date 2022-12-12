@@ -169,11 +169,9 @@ bool Joystick::readJoy(JoystickEvent* event)
 {
 	int bytes = read(_fd, event, sizeof(*event));
 
-
 	if (bytes == -1) {
 		return false;
 	}
-
 
 	if (event->type & JS_EVENT_BUTTON) {
 		buttonFlags = (event->value) ? (buttonFlags | 1ul << event->number) : (buttonFlags & ~(1uL << event->number));

@@ -18,30 +18,28 @@ devices =
 }
 
 v_devices = 
-   {
+{
     v0 = 
 	 {
-       name = "LinuxTrack",
-	    buttons = 32,
+       name = "LinuxTrack + buttons",
+	    buttons = 1,
 	    axes = 6
 	 },
 
     v1 = 
 	 {
-       name = "VIRPIL buttons 1",
-	    buttons = 32,
-	    axes = 2
+       name = "VPC THRTL",
+	    buttons = 35,
+	    axes = 3
 	 },
 
     v2 = 
 	 {
-       name = "VIRPIL buttons 2",
-	    buttons = 32,
-	    axes = 2
+      name = "VPC BASE",
+      buttons = 40,
+	    axes = 3
 	 },
-   }
-
-
+}
 
 -- Send method for keyboard. Key is given, i.e. KEY_G (check reference document for more supported key-codes), and state is given, i.e. 0 for release or 1 for press.
 -- send_keyboard_event(key, state)
@@ -85,11 +83,11 @@ function d0_b33_event(value)
    end
 end
 
-function d0_button_event(button, value)
-   if button < 32 then
-      send_button_event(1, button, value)
+function d0_button_event(button, value)   
+   if button >= v_devices.v1.buttons then
+      send_button_event(2, button - v_devices.v1.buttons, value)
    else
-      send_button_event(2, button-32, value)
+      send_button_event(1, button, value)
    end
 end
 

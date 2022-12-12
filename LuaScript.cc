@@ -119,7 +119,9 @@ void LuaScript::call_device_function_float(const std::string &str_func, float* p
 	}
 
 	retVal = lua_pcall(L, count, 0, 0); //Lua handle, number of arguments, number of return values, error code
-	//printf("call_device_function_float %d\n", retVal);
+	if (retVal) {
+		printf("call_device_function_float %d\n", retVal);
+	}
 }
 
 void LuaScript::call_device_function_int(const std::string &str_func, int* pValue, int count)
@@ -137,6 +139,9 @@ void LuaScript::call_device_function_int(const std::string &str_func, int* pValu
 	printf("\n");
 
 	retVal = lua_pcall(L, count, 0, 0); //Lua handle, number of arguments, number of return values, error code
+	if (retVal) {
+		printf("call_device_function_int %d\n", retVal);
+	}
 }
 
 

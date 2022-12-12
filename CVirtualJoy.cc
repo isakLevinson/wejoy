@@ -17,7 +17,6 @@ CVirtualJoy::CVirtualJoy(std::string name, unsigned int _buttons, unsigned int _
 		return;
 	}//if
 
-
 	//Setup buttons for device
 	if (_buttons > BUTTONS_SIZE) {
 		std::cout << "WARNING: Number of buttons (" << _buttons << ") for virtual device " << deviceid << " exceeds maximum allowable buttons which is " << (BUTTONS_SIZE - 1) << ".\n";
@@ -25,8 +24,11 @@ CVirtualJoy::CVirtualJoy(std::string name, unsigned int _buttons, unsigned int _
 	for (unsigned int i = 0; i < _buttons && i < BUTTONS_SIZE; i++) {
 		if (suinput_enable_event(fd, EV_KEY, buttons_ref::BUTTONS[i]) < 0) {
 			std::cout << "ERROR: Failed enabling event for button " << i << " on virtual device << " << deviceid << ".\n";
-		}//if
-	}//if
+		}
+
+		//printf("added button %2d: %04x\n", i, BTN_JOYSTICK + i);
+		printf("added button %2d: %04x\n", i, buttons_ref::BUTTONS[i]);
+	}
 
 	//Setup axes for device
 
@@ -66,7 +68,6 @@ CVirtualJoy::CVirtualJoy(std::string name, unsigned int _buttons, unsigned int _
 	std::cout << "Successfully created virtual device " << name.c_str() << deviceid << ".\n";
 	static_deviceid++;
 }
-
 
 CVirtualJoy::~CVirtualJoy()
 {
