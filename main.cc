@@ -119,13 +119,13 @@ int l_get_joy_axis_status(lua_State* L)
 }
 
 //Called from user via lua script
-int l_send_vjoy_button_event(lua_State* _L)
+int l_send_button_event(lua_State* _L)
 {
 	unsigned int id = lua_tonumber(_L, 1);
 	int type = lua_tonumber(_L, 2);
 	int value = lua_tonumber(_L, 3);
 
-	printf("l_send_vjoy_button_event %d %d %d\n", id, type, value);
+	printf("l_send_button_event %d %d %d\n", id, type, value);
 
 	if (id >= GLOBAL::vJoyList.size()) {
 		std::cout << "ERROR send_vjoy_button_event: Virtual device " << id << " does not exist.\n";
@@ -136,7 +136,7 @@ int l_send_vjoy_button_event(lua_State* _L)
 }
 
 //Called from user via lua script
-int l_send_vjoy_axis_event(lua_State* _L)
+int l_send_axis_event(lua_State* _L)
 {
 	unsigned int id = lua_tonumber(_L, 1);
 	int type = lua_tonumber(_L, 2);
@@ -179,6 +179,12 @@ int l_get_vjoy_axis_status(lua_State* L)
 	}
 	int status = GLOBAL::vJoyList[id]->get_axis_status(type);
 	lua_pushnumber(L, status);
+	return 1;
+}
+
+int l_ltr_recenter(lua_State* L)
+{
+	linuxtrack_recenter();
 	return 1;
 }
 
@@ -278,13 +284,15 @@ bool populate_virtual_devices(LuaScript &lScript)
 //Initialize lua functions
 void link_lua_functions(LuaScript &lScript)
 {
-	lScript.pushcfunction(l_send_vjoy_button_event, "send_button_event");
-	lScript.pushcfunction(l_send_vjoy_axis_event,   "send_axis_event");
+	lScript.pushcfunction(l_send_button_event, 		"send_button_event");
+	lScript.pushcfunction(l_send_axis_event,   		"send_axis_event");
 	lScript.pushcfunction(l_send_keyboard_event,    "send_keyboard_event");
 	lScript.pushcfunction(l_get_joy_button_status,  "get_button_status");
 	lScript.pushcfunction(l_get_joy_axis_status,    "get_axis_status");
 	lScript.pushcfunction(l_get_vjoy_button_status, "get_vjoy_button_status");
 	lScript.pushcfunction(l_get_vjoy_axis_status,   "get_vjoy_axis_status");
+	lScript.pushcfunction(l_ltr_recenter, 			"ltr_recenter");
+
 }
 
 

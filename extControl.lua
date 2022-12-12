@@ -21,7 +21,7 @@ v_devices =
 {
     v0 = 
 	 {
-       name = "LinuxTrack + buttons",
+       name = "LTR",
 	    buttons = 1,
 	    axes = 6
 	 },
@@ -83,7 +83,13 @@ function d0_b33_event(value)
    end
 end
 
-function d0_button_event(button, value)   
+function d0_button_event(button, value)
+   if     (button == 0) then  offsetZ = 0
+   elseif (button == 1) then  offsetZ = offsetZ - 1
+   elseif (button == 2) then  offsetZ = offsetZ + 1
+   elseif (button == 3) then  ltr_recenter()
+   end
+
    if button >= v_devices.v1.buttons then
       send_button_event(2, button - v_devices.v1.buttons, value)
    else
@@ -92,14 +98,14 @@ function d0_button_event(button, value)
 end
 
 
-function d0_a5_event(value)
-   offsetZ = value;
-end
+--function d0_a5_event(value)
+--   offsetZ = value;
+--end
 
 function ltr_event(x, y, z, rx, ry, rz)
    send_axis_event(0, 0, -gainShift * x)
    send_axis_event(0, 1,  gainShift * y)
-   send_axis_event(0, 2,  gainShift * z + offsetZ)
+   send_axis_event(0, 2,  gainShift * (z + offsetZ))
    send_axis_event(0, 3, -gainRotation * rx)
    send_axis_event(0, 4, -gainRotation * ry)
    send_axis_event(0, 5,  gainRotation * rz)
