@@ -107,7 +107,7 @@ void LuaScript::call_device_function(const std::string &str_func, int value)
 	lua_pcall(L, 1, 0, 0); //Lua handle, number of arguments, number of return values, error code
 }
 
-void LuaScript::call_device_function_fn(const std::string &str_func, float* pValue, int count)
+void LuaScript::call_device_function_float(const std::string &str_func, float* pValue, int count)
 {
 	int	retVal;
 	int i;
@@ -119,7 +119,24 @@ void LuaScript::call_device_function_fn(const std::string &str_func, float* pVal
 	}
 
 	retVal = lua_pcall(L, count, 0, 0); //Lua handle, number of arguments, number of return values, error code
-	printf("call_device_function_fn %d\n", retVal);
+	//printf("call_device_function_float %d\n", retVal);
+}
+
+void LuaScript::call_device_function_int(const std::string &str_func, int* pValue, int count)
+{
+	int	retVal;
+	int i;
+
+	lua_getglobal(L, str_func.c_str());
+
+	printf("call_device_function_int <%s>: ", str_func.c_str());
+	for (i = 0; i < count; i++) {
+		printf("%d ", pValue[i]);
+		lua_pushnumber(L, pValue[i]);
+	}
+	printf("\n");
+
+	retVal = lua_pcall(L, count, 0, 0); //Lua handle, number of arguments, number of return values, error code
 }
 
 

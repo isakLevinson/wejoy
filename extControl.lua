@@ -22,17 +22,23 @@ v_devices =
     v0 = 
 	 {
        name = "LinuxTrack",
-	    buttons = 1,
+	    buttons = 32,
 	    axes = 6
 	 },
 
     v1 = 
 	 {
-       name = "VIRPIL buttons",
+       name = "VIRPIL buttons 1",
 	    buttons = 32,
 	    axes = 2
-	 }
+	 },
 
+    v2 = 
+	 {
+       name = "VIRPIL buttons 2",
+	    buttons = 32,
+	    axes = 2
+	 },
    }
 
 
@@ -79,18 +85,24 @@ function d0_b33_event(value)
    end
 end
 
+function d0_button_event(button, value)
+   if button < 32 then
+      send_button_event(1, button, value)
+   else
+      send_button_event(2, button-32, value)
+   end
+end
+
+
 function d0_a5_event(value)
    offsetZ = value;
 end
 
 function ltr_event(x, y, z, rx, ry, rz)
-   send_axis_events(
-      -gainShift * x,
-      gainShift * y,
-      gainShift * z + offsetZ,
-      -gainRotation * rx,
-      -gainRotation * ry,
-      gainRotation * rz)
-
+   send_axis_event(0, 0, -gainShift * x)
+   send_axis_event(0, 1,  gainShift * y)
+   send_axis_event(0, 2,  gainShift * z + offsetZ)
+   send_axis_event(0, 3, -gainRotation * rx)
+   send_axis_event(0, 4, -gainRotation * ry)
+   send_axis_event(0, 5,  gainRotation * rz)
 end
-

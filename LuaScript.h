@@ -23,7 +23,8 @@ public:
 	std::vector<std::string> getTableKeys(const std::string &name);
 
 	void call_device_function(const std::string &str_func, int value);
-	void call_device_function_fn(const std::string &str_func, float* pValue, int count);
+	void call_device_function_float(const std::string &str_func, float* pValue, int count);
+	void call_device_function_int(const std::string &str_func, int* pValue, int count);
 
 	void pushcfunction(int (*)(lua_State*), const std::string &);
 	bool isOpen()

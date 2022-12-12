@@ -28,8 +28,9 @@ void updateThreadJoysticks(LuaScript &lScript)
 			if (GLOBAL::joyList[i]->readJoy(&event)) {
 				mtx.lock();
 				if (event.isButton()) {
-					printf("bton %d : %d\n", event.number, event.value);
-					lScript.call_device_function("d" + std::to_string(i) + "_b" + std::to_string(event.number) + "_event", event.value);
+					int val[2] = {event.number, event.value};
+					//printf("button %d : %d\n", event.number, event.value);
+					lScript.call_device_function_int("d" + std::to_string(i) + "_button_event", val, 2);
 				} else if (event.isAxis()) {
 					lScript.call_device_function("d" + std::to_string(i) + "_a" + std::to_string(event.number) + "_event", event.value);
 				}
@@ -47,7 +48,7 @@ void updateThreadJoysticks(LuaScript &lScript)
 				    axes.axes.x, axes.axes.y, axes.axes.z);
 			}
 
-			lScript.call_device_function_fn("ltr_event", axes.array, 6);
+			lScript.call_device_function_float("ltr_event", axes.array, 6);
 
 		} else {
 			//printf("... %d\n", retVal);
@@ -123,6 +124,8 @@ int l_send_vjoy_button_event(lua_State* _L)
 	unsigned int id = lua_tonumber(_L, 1);
 	int type = lua_tonumber(_L, 2);
 	int value = lua_tonumber(_L, 3);
+
+	printf("l_send_vjoy_button_event %d %d %d\n", id, type, value);
 
 	if (id >= GLOBAL::vJoyList.size()) {
 		std::cout << "ERROR send_vjoy_button_event: Virtual device " << id << " does not exist.\n";
