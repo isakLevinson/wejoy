@@ -1,3 +1,4 @@
+
 --Physical devices to use (type lsusb in terminal to list your connected devices)
 devices = 
 {
@@ -30,14 +31,14 @@ v_devices =
 	 {
        name = "VPC THRTL",
 	    buttons = 35,
-	    axes = 3
+	    axes = 2
 	 },
 
     v2 = 
 	 {
       name = "VPC BASE",
       buttons = 40,
-	    axes = 3
+	    axes = 2
 	 },
 }
 
@@ -61,32 +62,13 @@ local gainShift    = 300;
 local gainRotation = 100;
 local offsetZ      = 0;
 
-function d0_b31_event(value)
-   if value == 1 then
-      gainRotation   = 100;
-      gainShift      = 300;
-   end
-end
-
-function d0_b32_event(value)
-   if value == 1 then
-      gainRotation   = 0;
-      gainShift      = 0;
-      ltr_recenter()
-   end
-end
-
-function d0_b33_event(value)
-   if value == 1 then
-      gainRotation   = 20;
-      gainShift      = 60;
-   end
-end
-
 function d0_button_event(button, value)
+   --print("d0_button_event", button, value)
+   --print(os.clock())
+
    if     (button == 0) then  offsetZ = 0
-   elseif (button == 1) then  offsetZ = offsetZ - 1
-   elseif (button == 2) then  offsetZ = offsetZ + 1
+   elseif (button == 1) then  offsetZ = offsetZ - 10
+   elseif (button == 2) then  offsetZ = offsetZ + 10
    elseif (button == 3) then  ltr_recenter()
    end
 
@@ -98,9 +80,19 @@ function d0_button_event(button, value)
 end
 
 
---function d0_a5_event(value)
---   offsetZ = value;
---end
+function d0_a2_event(value)
+--   print("a2: ", value)
+end
+
+
+function d0_a3_event(value)
+--  print("a3: ", value)
+end
+
+function d0_a4_event(value)
+--   print("a4: ", value)
+end
+
 
 function ltr_event(x, y, z, rx, ry, rz)
    send_axis_event(0, 0, -gainShift * x)
